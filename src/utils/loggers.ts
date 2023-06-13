@@ -16,7 +16,7 @@ export const handleValidationError = (error: CustomError): ValidationErrors => {
     const duplicateKey : object = error.keyValue;
     const key = Object.keys(duplicateKey)[0];
     const value = Object.values(duplicateKey)[0];
-    validationErrors[key] = `${value} already registered.`;
+    validationErrors[key] = `The ${key} : ${value} already registered.`;
   } 
   
   else {

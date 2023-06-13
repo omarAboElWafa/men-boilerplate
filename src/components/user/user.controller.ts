@@ -12,10 +12,10 @@ class UserController {
 
     register = async (req: Request, res: Response) => {
         try{
-            const {firstName, lastName, email, password} =req.body;
+            const {firstName, lastName, email, password, phone} =req.body;
             const username = helpers.usernameFromEmail(email);
             const verified = false;
-            const user : NewUserInput<IUser> = {firstName, lastName, email, username, password, verified};
+            const user : NewUserInput<IUser> = {firstName, lastName, email, username, password, verified, phone};
             return res.status(201).send(await this.userService.addUser(user));
         }
         catch(error){

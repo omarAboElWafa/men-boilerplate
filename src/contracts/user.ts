@@ -5,7 +5,8 @@ export interface IUser extends Document{
     lastName: string
     email: string
     username: string
-    password: string
+    password: string,
+    phone: string,
     verified: boolean
 }
 

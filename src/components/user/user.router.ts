@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { checkPhone } from "../../utils/middlewares";
 import UserController from './user.controller';
 
 class UserRouter{
@@ -8,7 +9,7 @@ class UserRouter{
     }
     getRouter = () => {
         const router = Router();
-        router.post('/register', this.userController.register);
+        router.post('/register', checkPhone ,this.userController.register);
         router.post('/login', this.userController.login);
         router.get('/logout', this.userController.logout);
         router.get('/me', this.userController.me);

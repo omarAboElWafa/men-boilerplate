@@ -20,6 +20,7 @@ const UserSchema :Schema = new Schema({
         required: [true, 'Email is required'], 
         unique: true, 
         lowercase: true,
+        trim: true,
         validate: [validator.isEmail, 'Please enter a valid email']
     },
     username: {
@@ -31,6 +32,11 @@ const UserSchema :Schema = new Schema({
         type: String, 
         required: [true, 'Password is required'], 
         minlength: [8, 'Password should be at least 8 characters long']
+    },
+    phone: {
+        type: String,
+        required: [true, 'Phone number is required'],
+        unique: true,
     },
     verified: {
         type: Boolean, default: false},

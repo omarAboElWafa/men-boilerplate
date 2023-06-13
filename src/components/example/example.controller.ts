@@ -23,7 +23,7 @@ class ExampleController {
 
     getExamples = ( _ : Request, res : Response) => {
         return res.status(200).send(this.exampleService.getExamples());
-    }
+    }  
 
     getExampleById = (req : Request, res : Response) => {
         const id  = parseInt(req.params.id);

@@ -1,6 +1,8 @@
 import mongoose, {Schema} from "mongoose";
 import  validator   from "validator";
 import { IUser } from "@/contracts/user";
+import { comparePassword, generateAuthToken} from "../../utils/helpers";
+import { hashPassword } from "../../utils/hooks";
 
 const UserSchema :Schema = new Schema({
     firstName: {
@@ -38,10 +40,44 @@ const UserSchema :Schema = new Schema({
         required: [true, 'Phone number is required'],
         unique: true,
     },
+    loginCount :{
+        type: Number,
+        default: 0
+    },
     verified: {
         type: Boolean, default: false},
     },
     {timestamps: true}
 );
+
+
+//hash password before saving to database
+UserSchema.pre<IUser>('save', async function (next) {
+    const user = this;
+    if (user.isModified('password')) {
+        user.password = await hashPassword(user.password);
+    }
+    next();
+});
+
+
+//compare password
+UserSchema.methods.comparePassword = comparePassword;
+
+// increment login count
+UserSchema.methods.incrementLoginCount = async function()  {
+    // const user = this;
+    // user.loginCount = user.loginCount + 1;
+    // await user.save();
+    this.loginCount+=1;
+    return await this.save();
+}
+
+
+UserSchema.methods.generateAuthToken = async function() {
+    const user = this;
+    return await generateAuthToken(user);
+}
+
 
 export default mongoose.model<IUser>('User', UserSchema);

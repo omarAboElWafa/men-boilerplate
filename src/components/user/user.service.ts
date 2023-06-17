@@ -1,6 +1,6 @@
 import User from './user.entities'; 
 import { IUser, NewUserInput } from '@/contracts/user';
-import { handleValidationError } from '@/utils/loggers';
+import { handleValidationError } from '../../utils/loggers';
 
 class UserService {
     addUser = async (user: NewUserInput<IUser>) => {
@@ -10,6 +10,9 @@ class UserService {
         } catch(error){
             throw error;
         }
+    }
+    findUserByEmail = async (email: string) => {
+        return await User.findOne({email}).lean();
     }
 }
 

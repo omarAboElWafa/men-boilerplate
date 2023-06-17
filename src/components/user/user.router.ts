@@ -15,6 +15,9 @@ class UserRouter{
         router.get('/me', this.userController.me);
         router.post('/refresh-token', this.userController.refreshToken);
         router.post('/forgot-password', this.userController.forgotPassword);
+        router.post('/reset-password', this.userController.resetPassword);
+        router.post('/verify-email', this.userController.verifyEmail);
+        router.post('/verify-phone', this.userController.verifyPhone);
         return router;
     }
 }

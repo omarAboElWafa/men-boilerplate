@@ -74,11 +74,11 @@ UserSchema.methods.incrementLoginCount = async function()  {
     return await this.save();
 }
 
-
-UserSchema.methods.generateAuthToken = async function() {
-    const user = this;
-    return await generateAuthToken(user);
-}
+// TODO: revisit this, to make it work instead of helper function
+// UserSchema.methods.generateAuthToken = async function() {
+//     const user = this;
+//     return await generateAuthToken(user);
+// }
 
 
 export default mongoose.model<IUser>('User', UserSchema);

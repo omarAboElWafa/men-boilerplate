@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { HASH_SALT_ROUNDS, JWT_SECRET } from './config';
+import { HASH_SALT_ROUNDS, ACCESS_TOKEN_SECRET } from './config';
 
 
 export const hashPassword = async (password :string) => {

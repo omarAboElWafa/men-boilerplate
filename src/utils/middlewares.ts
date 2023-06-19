@@ -1,7 +1,8 @@
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from './config';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from './config';
+import * as cache from "./cache";
 
 export const checkPhone = (req:Request, res:Response, next:NextFunction) => {
     if (req.body.phone) {
@@ -28,7 +29,7 @@ export const checkPhone = (req:Request, res:Response, next:NextFunction) => {
     }
 }
 
-export const verifyAccessToken = (req: Request, res: Response, next : NextFunction) => {
+export const verifyAccessToken = async (req: Request, res: Response, next : NextFunction) => {
     const authHeader :string = req.headers.authorization? req.headers.authorization : '';
     if(!authHeader){
         return res.status(401).send({message: "No Access Token provided"});
@@ -38,13 +39,48 @@ export const verifyAccessToken = (req: Request, res: Response, next : NextFuncti
         return res.status(401).send({message: "Invalid Access Token"});
     }
     try{
-        const decodedToken = jwt.verify(token, JWT_SECRET);
+        const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET);
         const { _id } = decodedToken as { _id : string };
+        if(!_id){
+            return res.status(401).send({message: "Invalid Access Token"});
+        }
+        // check if the access token is in redis
+        const cacheTokenClient = await cache.getClient();
+        const cacheAccessValue = await cache.getFromCache(cacheTokenClient, `access-${_id}`);
+        if(!cacheAccessValue || cacheAccessValue !== token){
+            return res.status(401).send({message: "Invalid Access Token"});
+        }
         req.body.userID = _id;
         next();
     }
     catch(error){
         console.log(error);
         return res.status(401).send({message: "Invalid Access Token"});
+    }
+}
+
+
+export const verifyRefreshToken = (req: Request, res: Response, next : NextFunction) => {
+    const authHeader :string = req.headers.authorization? req.headers.authorization : '';
+    if(!authHeader){
+        return res.status(401).send({message: "No Access Token provided"});
+    }
+    const refreshToken = authHeader.split(' ')[1];
+    if(!refreshToken){
+        return res.status(401).send({message: "Invalid Access Token"});
+    }
+    try{
+        const decodedToken = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+        const { _id } = decodedToken as { _id : string };
+        if(!_id){
+            return res.status(401).send({message: "Invalid Refresh Token"});
+        }
+        req.body.userID = _id;
+        req.body.clientRefreshToken = refreshToken;
+        next();
+    }
+    catch(error){
+        console.log(error);
+        return res.status(401).send({message: "Invalid Refresh Token"});
     }
 }

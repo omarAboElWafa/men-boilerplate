@@ -28,6 +28,7 @@ class UserController {
             const {email, password} = req.body;
             const user = await this.userService.findUserByEmail(email);
             if(!user){
+                //TODO: change the error message
                 return res.status(401).send({message: "No user found with this email"});
             }
             const isMatch = await helpers.comparePassword(password, user.password);
@@ -44,7 +45,19 @@ class UserController {
     }
 
     logout = async (req: Request, res: Response) => {}
-    me = async (req: Request, res: Response) => {}
+    me = async (req: Request, res: Response) => {
+        try{
+            const user = await this.userService.findUserById(req.body.userID);
+            if(!user){
+                return res.status(404).send({message: "User not found"});
+            }
+            return res.status(200).send(user);
+        }
+        catch(error){
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
     refreshToken = async (req: Request, res: Response) => {}
     forgotPassword = async (req: Request, res: Response) => {}
     resetPassword = async (req: Request, res: Response) => {}

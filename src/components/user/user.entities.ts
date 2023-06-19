@@ -65,6 +65,7 @@ UserSchema.pre<IUser>('save', async function (next) {
 UserSchema.methods.comparePassword = comparePassword;
 
 // increment login count
+// TODO: check if this works
 UserSchema.methods.incrementLoginCount = async function()  {
     // const user = this;
     // user.loginCount = user.loginCount + 1;

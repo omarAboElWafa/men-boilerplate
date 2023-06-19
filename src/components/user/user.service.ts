@@ -1,6 +1,5 @@
 import User from './user.entities'; 
 import { IUser, NewUserInput } from '@/contracts/user';
-import { handleValidationError } from '../../utils/loggers';
 
 class UserService {
     addUser = async (user: NewUserInput<IUser>) => {
@@ -14,6 +13,11 @@ class UserService {
     findUserByEmail = async (email: string) => {
         return await User.findOne({email}).lean();
     }
+
+    findUserById = async (id: string) => {
+        return await User.findById(id).select('-password').lean();
+    }
+
 }
 
 export default UserService;

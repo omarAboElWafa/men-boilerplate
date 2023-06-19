@@ -14,6 +14,6 @@ export const comparePassword = async (password :string, hashedPassword :string) 
 }
 
 export const generateAuthToken = async (user : {} & mongoose.AnyObject) => {
-    const token = jwt.sign({ _id : user.id }, JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ _id : user._id }, JWT_SECRET, { expiresIn: '1d' });
     return token;
 }

@@ -125,6 +125,10 @@ class UserController {
                 return res.status(404).send({message: "User not found"});
             }
             const newAccessToken = await helpers.generateAuthToken(user, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY);
+            const accessStored = this.userService.storeToken(`access-${user._id}`, newAccessToken);
+            if(!accessStored){
+                return res.status(500).send({message: "Something went wrong"});
+            }
             return res.status(200).send({accessToken: newAccessToken});
         }
         catch(error){

@@ -46,5 +46,5 @@ export const clearCache = (client:Redis) :Promise<string> => {
 }
 
 export const closeClient = async (client:Redis) => {
-  return await client.quit();
+  return await client.disconnect();
 }

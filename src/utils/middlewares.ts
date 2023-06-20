@@ -45,7 +45,7 @@ export const verifyAccessToken = async (req: Request, res: Response, next : Next
             return res.status(401).send({message: "Invalid Access Token"});
         }
         // check if the access token is in redis
-        const cacheTokenClient = await cache.getClient();
+        const cacheTokenClient = cache.tokenClientPool;
         const cacheAccessValue = await cache.getFromCache(cacheTokenClient, `access-${_id}`);
         if(!cacheAccessValue || cacheAccessValue !== token){
             return res.status(401).send({message: "Invalid Access Token"});

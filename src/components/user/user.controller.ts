@@ -139,7 +139,29 @@ class UserController {
     }
     forgotPassword = async (req: Request, res: Response) => {}
     resetPassword = async (req: Request, res: Response) => {}
-    verifyEmail = async (req: Request, res: Response) => {}
+    verifyEmail = async (req: Request, res: Response) => {
+        try{
+            const {email} = req.body;
+            const user = await this.userService.findUserByEmail(email);
+            if(!user){
+                return res.status(404).send({message: "User not found"});
+            }
+            const otp = helpers.generateOTP();
+            const emailSent = await helpers.sendEmail(email, otp);
+            if(!emailSent){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+            const otpStored =  this.userService.storeToken(`email-otp-${user._id}`, otp);
+            if(!otpStored){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+            return res.status(200).send({message: "Email sent successfully, please check your email"});
+        }
+        catch(error){
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
     verifyPhone = async (req: Request, res: Response) => {}
 
 }

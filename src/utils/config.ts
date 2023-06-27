@@ -18,3 +18,16 @@ export const ACCESS_TOKEN_EXPIRY: string = process.env.ACCESS_TOKEN_EXPIRY || ""
 export const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET || "";
 export const REFRESH_TOKEN_EXPIRY: string = process.env.REFRESH_TOKEN_EXPIRY || "";
 export const REFRESH_TOKEN_EXPIRY_FOR_CACHE: number = parseInt(process.env.REFRESH_TOKEN_EXPIRY_FOR_CACHE || "60");
+
+// OTP and Email Config
+export const OTP_SECRET : string = process.env.OTP_SECRET || '';
+export const EMAIL_CONFIGS = {
+    service: process.env.EMAIL_SERVICE || '',
+    host: process.env.EMAIL_HOST || '',
+    secure: process.env.EMAIL_SECURE === 'true' ? true : false,
+    port: parseInt(process.env.EMAIL_PORT || '0'),
+    user: process.env.EMAIL_USER || '',
+    pass: process.env.EMAIL_PASS || ''
+};
+export const SENDER_MAIL :string = process.env.SENDER_MAIL || '';
+export const OTP_VALIDITY_PERIOD : number = parseInt(process.env.OTP_VALIDITY_PERIOD || "5");

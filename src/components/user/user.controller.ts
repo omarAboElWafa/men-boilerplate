@@ -3,7 +3,7 @@ import UserService from "./user.service";
 import * as helpers from "../../utils/helpers";
 import { handleValidationError } from "../../utils/loggers";
 import { IUser, NewUserInput } from "@/contracts/user";
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY } from "../../utils/config";
+import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY_FOR_CACHE, OTP_TOKEN_EXPIRY_FOR_CACHE, ACCESS_TOKEN_EXPIRY_FOR_CACHE } from "../../utils/config";
 
 class UserController {
     userService : UserService;
@@ -48,8 +48,8 @@ class UserController {
             }
             
             // Store the refresh token in redis
-            const refreshStored = this.userService.storeToken(user._id, refreshToken);
-            const accessStored = this.userService.storeToken(`access-${user._id}`, accessToken);
+            const refreshStored = this.userService.storeToken(user._id, refreshToken, REFRESH_TOKEN_EXPIRY_FOR_CACHE);
+            const accessStored = this.userService.storeToken(`access-${user._id}`, accessToken, ACCESS_TOKEN_EXPIRY_FOR_CACHE);
             if(!refreshStored || !accessStored){
                 return res.status(500).send({message: "Something went wrong"});
             }
@@ -125,7 +125,7 @@ class UserController {
                 return res.status(404).send({message: "User not found"});
             }
             const newAccessToken = await helpers.generateAuthToken(user, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY);
-            const accessStored = this.userService.storeToken(`access-${user._id}`, newAccessToken);
+            const accessStored = this.userService.storeToken(`access-${user._id}`, newAccessToken, REFRESH_TOKEN_EXPIRY_FOR_CACHE);
             if(!accessStored){
                 return res.status(500).send({message: "Something went wrong"});
             }
@@ -151,7 +151,7 @@ class UserController {
             if(!emailSent){
                 return res.status(500).send({message: "Something went wrong"});
             }
-            const otpStored =  this.userService.storeToken(`email-otp-${user._id}`, otp);
+            const otpStored =  this.userService.storeToken(`email-otp-${user._id}`, otp, OTP_TOKEN_EXPIRY_FOR_CACHE);
             if(!otpStored){
                 return res.status(500).send({message: "Something went wrong"});
             }

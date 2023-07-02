@@ -21,9 +21,9 @@ class UserService {
         return await User.findById(id).select({ password: 0, _id: 0 }).lean();
     }
 
-    storeToken = async (id: string, token: string) => {
+    storeToken = async (id: string, token: string, expiresIn : number) => {
         const tokensCacheClient = cache.tokenClientPool;
-        const stored =  await cache.setToCache(tokensCacheClient, id, token, REFRESH_TOKEN_EXPIRY_FOR_CACHE);
+        const stored =  await cache.setToCache(tokensCacheClient, id, token, expiresIn);
         
         return stored;
     }

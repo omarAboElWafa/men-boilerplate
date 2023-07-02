@@ -15,12 +15,14 @@ export const HASH_SALT_ROUNDS: number = parseInt(
 
 export const ACCESS_TOKEN_SECRET: string = process.env.ACCESS_TOKEN_SECRET || "";
 export const ACCESS_TOKEN_EXPIRY: string = process.env.ACCESS_TOKEN_EXPIRY || "";
+export const ACCESS_TOKEN_EXPIRY_FOR_CACHE = parseInt(process.env.ACCESS_TOKEN_EXPIRY_FOR_CACHE || "60");
 export const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET || "";
 export const REFRESH_TOKEN_EXPIRY: string = process.env.REFRESH_TOKEN_EXPIRY || "";
 export const REFRESH_TOKEN_EXPIRY_FOR_CACHE: number = parseInt(process.env.REFRESH_TOKEN_EXPIRY_FOR_CACHE || "60");
 
 // OTP and Email Config
 export const OTP_SECRET : string = process.env.OTP_SECRET || '';
+export const OTP_TOKEN_EXPIRY_FOR_CACHE : number = parseInt(process.env.OTP_TOKEN_EXPIRY_FOR_CACHE || "60");
 export const EMAIL_CONFIGS = {
     service: process.env.EMAIL_SERVICE || '',
     host: process.env.EMAIL_HOST || '',

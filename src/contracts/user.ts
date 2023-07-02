@@ -10,4 +10,4 @@ export interface IUser extends Document{
     verified: boolean
 }
 
-export type NewUserInput<T> = Omit<T, keyof Document>;
+export type UserInput<T> = Omit<T, keyof Document>;

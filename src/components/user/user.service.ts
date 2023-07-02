@@ -1,10 +1,10 @@
 import User from './user.entities'; 
-import { IUser, NewUserInput } from '@/contracts/user';
+import { IUser, UserInput } from '@/contracts/user';
 import * as cache from "../../utils/cache";
 import { REFRESH_TOKEN_EXPIRY_FOR_CACHE } from '../../utils/config';
 
 class UserService {
-    addUser = async (user: NewUserInput<IUser>) => {
+    addUser = async (user: UserInput<IUser>) => {
         try{
             const newUSer = new User(user);
             return await newUSer.save();
@@ -17,8 +17,14 @@ class UserService {
     }
 
     findUserById = async (id: string, fullUser:boolean = false) => {
-        if(fullUser) return await User.findById(id).select({ password: 0 }).lean();
+        if(fullUser) return await User.findById(id).lean();
         return await User.findById(id).select({ password: 0, _id: 0 }).lean();
+    }
+
+    updateUser = async (id: string, toBeUpdated : Object) => {
+        const updated = await User.findByIdAndUpdate(id, toBeUpdated, {new: true});
+        const updatedUser = new User(updated);
+        return await updatedUser.save();
     }
 
     storeToken = async (id: string, token: string, expiresIn : number) => {

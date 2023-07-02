@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import UserService from "./user.service";
 import * as helpers from "../../utils/helpers";
 import { handleValidationError } from "../../utils/loggers";
-import { IUser, NewUserInput } from "@/contracts/user";
+import { IUser, UserInput } from "@/contracts/user";
 import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY_FOR_CACHE, OTP_TOKEN_EXPIRY_FOR_CACHE, ACCESS_TOKEN_EXPIRY_FOR_CACHE } from "../../utils/config";
 
 class UserController {
@@ -16,7 +16,7 @@ class UserController {
             const {firstName, lastName, email, password, phone} =req.body;
             const username = helpers.usernameFromEmail(email);
             const verified = false;
-            const user : NewUserInput<IUser> = {firstName, lastName, email, username, password, verified, phone};
+            const user : UserInput<IUser> = {firstName, lastName, email, username, password, verified, phone};
             return res.status(201).send(await this.userService.addUser(user));
         }
         catch(error){
@@ -138,7 +138,30 @@ class UserController {
         
     }
     forgotPassword = async (req: Request, res: Response) => {}
-    resetPassword = async (req: Request, res: Response) => {}
+    resetPassword = async (req: Request, res: Response) => {
+        try{
+            const { userID, oldPassword, newPassword } = req.body;
+            const user = await this.userService.findUserById(userID, true);
+            if(!user){
+                return res.status(404).send({message: "Invalid user"});
+            }
+            const isMatch = await helpers.comparePassword(oldPassword, user.password);
+            if(!isMatch){
+                return res.status(401).send({message: "Wrong password"});
+            }
+            const userInput : Object = {password: newPassword};
+            const updatedUser = await this.userService.updateUser(userID, userInput);
+            if(!updatedUser){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+            return res.status(200).send({message: "Password updated successfully"});
+            
+        }
+        catch(error){
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
     verifyEmail = async (req: Request, res: Response) => {
         try{
             const {email} = req.body;

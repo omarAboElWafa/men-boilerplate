@@ -22,14 +22,14 @@ export const generateAuthToken = async (user : {} & mongoose.AnyObject, secret :
 
 //OTP Methods
 export const generateOTP = () : string => {
-    return generate(6, { upperCaseAlphabets: false, specialChars: false});
+    return generate(6, { digits:true, upperCaseAlphabets: false, specialChars: false});
 }
 
 export const sendEmail = async (email : string, otp : string) : Promise<Object> => {
     const nodeMailerService = new NodemailerService();
     const mailSender = new MailSender(nodeMailerService);
     const subject = "OTP for email verification";
-    const text = `Your OTP for email verification is ${otp}`;
+    const text = `<h1>Verification OTP</h1><p>Your OTP for email verification is :</p> <h4>${otp}</h4>`;
     const from = SENDER_MAIL;
     try{
         return await mailSender.sendMail(from, email, subject, text);

@@ -17,9 +17,7 @@ export class NodemailerService implements IMailerService {
     private transporter : nodemailer.Transporter;
     constructor() {
         this.transporter = nodemailer.createTransport({
-            host: EMAIL_CONFIGS.host,
-            port: EMAIL_CONFIGS.port,
-            secure: EMAIL_CONFIGS.secure,
+            service: EMAIL_CONFIGS.service,
             auth: {
                 user: EMAIL_CONFIGS.user,
                 pass: EMAIL_CONFIGS.pass
@@ -31,7 +29,7 @@ export class NodemailerService implements IMailerService {
             from: from,
             to: to,
             subject: subject,
-            text: text,
+            html: text,
           };
         return this.transporter.sendMail(mailOptions).then((info) => {
             return info;

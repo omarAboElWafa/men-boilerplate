@@ -45,8 +45,14 @@ const UserSchema :Schema = new Schema({
         default: 0
     },
     verified: {
-        type: Boolean, default: false},
+        type: Boolean, default: false
     },
+   
+    qualified: {
+        type: Boolean, default: false
+    },
+    },
+    
     {timestamps: true}
 );
 

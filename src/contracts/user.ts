@@ -8,6 +8,7 @@ export interface IUser extends Document{
     password: string,
     phone: string,
     verified: boolean
+    qualified: boolean
 }
 
 export type UserInput<T> = Omit<T, keyof Document>;

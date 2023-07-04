@@ -16,7 +16,8 @@ class UserController {
             const {firstName, lastName, email, password, phone} =req.body;
             const username = helpers.usernameFromEmail(email);
             const verified = false;
-            const user : UserInput<IUser> = {firstName, lastName, email, username, password, verified, phone};
+            const qualified = false;
+            const user : UserInput<IUser> = { firstName, lastName, email, username, password, verified, phone, qualified};
             return res.status(201).send(await this.userService.addUser(user));
         }
         catch(error){
@@ -24,6 +25,7 @@ class UserController {
             return res.status(400).send(handleValidationError(error));
         }
     }
+
     login = async (req: Request, res: Response) => {
         try{
             const {email, password} = req.body;
@@ -86,6 +88,7 @@ class UserController {
             return res.status(400).send(handleValidationError(error));
         }
     }
+
     me = async (req: Request, res: Response) => {
         try{
             const user = await this.userService.findUserById(req.body.userID);
@@ -99,8 +102,8 @@ class UserController {
             return res.status(400).send(handleValidationError(error));
         }
     }
-    refreshToken = async (req: Request, res: Response) => {
 
+    refreshToken = async (req: Request, res: Response) => {
         try{
             const {clientRefreshToken} = req.body;
             if(!clientRefreshToken){
@@ -137,8 +140,51 @@ class UserController {
         }
         
     }
-    forgotPassword = async (req: Request, res: Response) => {}
+
+    forgotPassword = async (req: Request, res: Response) => {
+        try{
+            const { email } = req.body;
+            const user = await this.userService.findUserByEmail(email);
+            if(!user){
+                return res.status(404).send({message: "Invalid user"});
+            }
+            const token = await helpers.generateRandomToken();
+            const resetPasswordLink = `${process.env.BASE_URL}/reset-password/${user._id}/${token}`;
+            const messageText = `<p>Click <a href="${resetPasswordLink}">here</a> to reset your password</p>`;
+            const sent = await helpers.sendGenericEmail(email, "Reset Password", messageText);
+            if(!sent){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+            return res.status(200).send({message: "Reset password link sent to your email"});
+        }
+        catch(error){
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
+
     resetPassword = async (req: Request, res: Response) => {
+        try{
+            const { id, token } = req.params;
+            const user = await this.userService.findUserById(id);
+            if(!user){
+                return res.status(404).send({message: "Invalid user"});
+            }
+            const isValidToken = await this.userService.findToken(`reset-password-${user._id}`);
+            if(!isValidToken || isValidToken !== token){
+                return res.status(401).send({message: "Invalid token"});
+            }
+            const accessToken = await helpers.generateAuthToken(user, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY);
+            const accessStored = this.userService.storeToken(`access-${user._id}`, accessToken, ACCESS_TOKEN_EXPIRY_FOR_CACHE);
+            return res.status(200).send({'accessToken' : accessToken});   
+        }
+        catch(error){
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
+
+    changePassword = async (req: Request, res: Response) => {
         try{
             const { userID, oldPassword, newPassword } = req.body;
             const user = await this.userService.findUserById(userID, true);
@@ -162,31 +208,134 @@ class UserController {
             return res.status(400).send(handleValidationError(error));
         }
     }
+
     verifyEmail = async (req: Request, res: Response) => {
         try{
-            const {email} = req.body;
+            const {email, otp, userID} = req.body;
             const user = await this.userService.findUserByEmail(email);
             if(!user){
                 return res.status(404).send({message: "User not found"});
             }
-            const otp = helpers.generateOTP();
-            const emailSent = await helpers.sendEmail(email, otp);
-            if(!emailSent){
+
+            if(user._id !== userID){
+                return res.status(401).send({message: "Unauthorized user"});
+            }
+
+            if(user.verified){
+                return res.status(200).send({message: "Email already verified"});
+            }
+
+            const retrievedOtp = await this.userService.findToken(`email-otp-${user._id}`);
+            if(!retrievedOtp){
+                return res.status(401).send({message: "No OTP generated"});
+            }
+
+            if(retrievedOtp !== otp){
+                return res.status(401).send({message: "Invalid OTP"});
+            }
+
+            const verifyEmail = await this.userService.updateUser(user._id, {verified: true});
+            if(!verifyEmail){
                 return res.status(500).send({message: "Something went wrong"});
             }
-            const otpStored =  this.userService.storeToken(`email-otp-${user._id}`, otp, OTP_TOKEN_EXPIRY_FOR_CACHE);
-            if(!otpStored){
-                return res.status(500).send({message: "Something went wrong"});
-            }
-            return res.status(200).send({message: "Email sent successfully, please check your email"});
+
+            return res.status(200).send({message: "Email verified successfully"});
         }
         catch(error){
             console.log(error);
             return res.status(400).send(handleValidationError(error));
         }
     }
-    verifyPhone = async (req: Request, res: Response) => {}
 
+    verifyPhone = async (req: Request, res: Response) => {
+        try {
+            const { phone, otp, userID } = req.body;
+            const user = await this.userService.findUserByUniqueAttribute('phone', phone);
+            if(!user){
+                return res.status(404).send({message: "User not found"});
+            }
+
+            if(user._id !== userID){
+                return res.status(401).send({message: "Unauthorized user"});
+            }
+
+            if(user.qualified){
+                return res.status(200).send({message: "Phone already verified"});
+            }
+
+            const retrievedOtp = await this.userService.findToken(`phone-otp-${user._id}`);
+            if(!retrievedOtp){
+                return res.status(401).send({message: "No OTP generated or OTP expired"});
+            }
+
+            if(retrievedOtp !== otp){
+                return res.status(401).send({message: "Invalid OTP"});
+            }
+
+            const verifyPhone = await this.userService.updateUser(user._id, {qualified: true});
+            if(!verifyPhone){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+
+            return res.status(200).send({message: "Phone verified successfully"});
+        } catch (error) {
+            console.log(error);
+            return res.status(400).send(handleValidationError(error));
+        }
+    }
+
+    issueOTP = async (req: Request, res: Response) => {
+        try {
+            const { phone, email }  = req.body;
+            if(!phone && !email){
+                return res.status(400).send({message: 'Invalid verification method.'});
+            }
+            if(phone && email){
+                return res.status(400).send({message: 'Only one verification method is allowed.'});
+            }
+            const via = phone ? 'phone' : 'email';
+
+            const otp = helpers.generateOTP();
+            if(!otp){
+                return res.status(500).send({message: "Something went wrong"});
+            }
+
+            if(email){
+                const user = await this.userService.findUserByUniqueAttribute('email', email);
+                if(!user){
+                    return res.status(404).send({ message : 'No user found' });                
+                }
+                const emailSent = await helpers.sendVerificationEmail(user.email, otp);
+                if(!emailSent){
+                    return res.status(500).send({message: "Something went wrong"});
+                }
+                const otpStored =  this.userService.storeToken(`email-otp-${user._id}`, otp, OTP_TOKEN_EXPIRY_FOR_CACHE);
+                if(!otpStored){
+                    return res.status(500).send({message: "Something went wrong"});
+                }
+            }
+
+            if(phone){
+                const user = await this.userService.findUserByUniqueAttribute('phone', phone);
+                if(!user){
+                    return res.status(404).send({ message : 'No user found' });
+                }
+                const mobileSent = await helpers.sendToMobile(phone, otp);
+                if(!mobileSent){
+                    return res.status(500).send({message: "Something went wrong"});
+                }
+                const otpStored =  this.userService.storeToken(`phone-otp-${user._id}`, otp, OTP_TOKEN_EXPIRY_FOR_CACHE);
+                if(!otpStored){
+                    return res.status(500).send({message: "Something went wrong"});
+                }
+            }
+            return res.status(200).send({message: `Sent successfully, please check your ${via}`});
+
+        } catch (error) {
+            console.log(error);
+            res.status(400).send(handleValidationError(error));
+        }
+    }
 }
 
 export default UserController;

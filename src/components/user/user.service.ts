@@ -21,6 +21,13 @@ class UserService {
         return await User.findById(id).select({ password: 0, _id: 0 }).lean();
     }
 
+    findUserByUniqueAttribute = async (attribute: string, value: string) => {
+        const validAttributes = ['email', 'phone'];
+        if(!validAttributes.includes(attribute)) throw new Error('Invalid attribute');
+        const query : Object = {attribute: value};
+        return await User.findOne(query).select({password: 0, _id: 0}).lean();
+    }
+
     updateUser = async (id: string, toBeUpdated : Object) => {
         const updated = await User.findByIdAndUpdate(id, toBeUpdated, {new: true});
         const updatedUser = new User(updated);

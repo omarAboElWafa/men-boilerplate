@@ -33,3 +33,9 @@ export const EMAIL_CONFIGS = {
 };
 export const SENDER_MAIL :string = process.env.SENDER_MAIL || '';
 export const OTP_VALIDITY_PERIOD : number = parseInt(process.env.OTP_VALIDITY_PERIOD || "5");
+
+export const SMS_CONFIG  = {
+  sid: process.env.TWILIO_ACC_SID || "",
+  authToken: process.env.TWILIO_AUTH_TOKEN || "",
+  twilioMobNumber: process.env.TWILIO_MOBILE_NUM || ""
+};

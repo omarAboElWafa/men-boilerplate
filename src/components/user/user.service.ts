@@ -2,6 +2,7 @@ import User from './user.entities';
 import { IUser, UserInput } from '@/contracts/user';
 import * as cache from "../../utils/cache";
 import { REFRESH_TOKEN_EXPIRY_FOR_CACHE } from '../../utils/config';
+import { Console } from 'console';
 
 class UserService {
     addUser = async (user: UserInput<IUser>) => {
@@ -21,15 +22,16 @@ class UserService {
         return await User.findById(id).select({ password: 0, _id: 0 }).lean();
     }
 
-    findUserByUniqueAttribute = async (attribute: string, value: string) => {
+    findUserByUniqueAttribute = async (attribute: string, value: string, fullUser:boolean = false) => {
         const validAttributes = ['email', 'phone'];
         if(!validAttributes.includes(attribute)) throw new Error('Invalid attribute');
-        const query : Object = {attribute: value};
+        const query = {[attribute]: value};
+        if(fullUser){return await User.findOne(query).select({password: 0}).lean();}
         return await User.findOne(query).select({password: 0, _id: 0}).lean();
     }
 
     updateUser = async (id: string, toBeUpdated : Object) => {
-        const updated = await User.findByIdAndUpdate(id, toBeUpdated, {new: true});
+        const updated = await User.findByIdAndUpdate(id, {$set: toBeUpdated}, {new: true });
         const updatedUser = new User(updated);
         return await updatedUser.save();
     }

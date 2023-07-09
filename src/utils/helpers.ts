@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { generate } from 'otp-generator';
 import {NodemailerService, MailSender} from './mailService';
-import { SENDER_MAIL } from './config';
+import { SENDER_MAIL, RESET_PASSWORD_TOKEN_SECRET } from './config';
 import * as sms from './sms';
 
 export const usernameFromEmail = (email : string) => {
@@ -20,9 +20,16 @@ export const generateAuthToken = async (user : {} & mongoose.AnyObject, secret :
     return token;
 }
 
-export const generateRandomToken = async (length : number = 8) => {
-    const token = await bcrypt.genSalt(length);
-    return token;
+
+export const generateResetPasswordToken = async (user : {} & mongoose.AnyObject) => {
+    const resetPasswordToken = await jwt.sign({ _id : user._id }, RESET_PASSWORD_TOKEN_SECRET, { expiresIn: '1h' });
+    return resetPasswordToken;
+}
+
+export const decodeResetPasswordToken = async (token : string) => {
+    const decoded = await jwt.verify(token, RESET_PASSWORD_TOKEN_SECRET);
+    const { _id } = decoded as { _id : string };
+    return _id;
 }
 
 

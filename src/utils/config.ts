@@ -19,6 +19,8 @@ export const ACCESS_TOKEN_EXPIRY_FOR_CACHE = parseInt(process.env.ACCESS_TOKEN_E
 export const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET || "";
 export const REFRESH_TOKEN_EXPIRY: string = process.env.REFRESH_TOKEN_EXPIRY || "";
 export const REFRESH_TOKEN_EXPIRY_FOR_CACHE: number = parseInt(process.env.REFRESH_TOKEN_EXPIRY_FOR_CACHE || "60");
+export const RESET_PASSWORD_TOKEN_EXPIRY_FOR_CACHE: number = parseInt(process.env.RESET_PASSWORD_TOKEN_EXPIRY_FOR_CACHE || "60");
+export const RESET_PASSWORD_TOKEN_SECRET: string = process.env.RESET_PASSWORD_TOKEN_SECRET || "";
 
 // OTP and Email Config
 export const OTP_SECRET : string = process.env.OTP_SECRET || '';

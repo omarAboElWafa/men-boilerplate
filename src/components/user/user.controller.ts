@@ -153,7 +153,7 @@ class UserController {
             // if(!storedToken){
             //     return res.status(500).send({message: "Something went wrong"});
             // }
-            const resetPasswordLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
+            const resetPasswordLink = `${process.env.BASE_URL}/users/reset-password?token=${token}`;
             const messageText = `<p>Click <a href="${resetPasswordLink}">here</a> to reset your password</p>`;
             const sent = await helpers.sendGenericEmail(email, "Reset Password", messageText);
             if(!sent){

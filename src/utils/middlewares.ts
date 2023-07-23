@@ -32,7 +32,7 @@ export const checkPhone = (req:Request, res:Response, next:NextFunction) => {
 export const checkEmail = (req:Request, res:Response, next: NextFunction) => {
     const { email } = req.body;
     const emailRegex : RegExp = /^[^\s@]+@[^\s@]+\.[^\s@.]+$/;
-    if(!emailRegex.test(email)){
+    if(email && !emailRegex.test(email)){
         return res.status(400).send({message: 'Invalid email'});
     }
     next();

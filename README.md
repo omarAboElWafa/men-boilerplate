@@ -1,7 +1,7 @@
 <h1 align="center"></h1>
-<h2 align="center">A Boilerplate written with TypeScript on Node.js runtime to achieve scalability, mentainability, and simplicity of coding</h2>
+<h2 align="center">A Boilerplate written with TypeScript on Node.js runtime to achieve scalability, maintainability, and simplicity of coding</h2>
 
-MEN-BOILERPLATE is a boilerplate written with TypeScript on Node.js runtime depending on <strong >the dependency injection pattern </strong> to achieve scalability, mentainability, and simplicity of coding. It is a boilerplate for building scalable server-side applications, using modern technologies such as TypeScript, Node.js, Express, Redis, and MongoDB.
+MEN-BOILERPLATE is a boilerplate written with TypeScript on Node.js runtime depending on <strong >the dependency injection pattern </strong> to achieve scalability, maintainability, and simplicity of coding. It is a boilerplate for building scalable server-side applications, using modern technologies such as TypeScript, Node.js, Express, Redis, and MongoDB.
 
 MEN Boilerplate includes essential features that every API requires, such as Mailer, SMS, Authentication, Authorization, Notifications, Payments, Subscriptions, and more.
 
@@ -158,7 +158,7 @@ export default mongoose.model < IUser > ("User", UserSchema);
 
 ### Routers
 
-Within the router you should define the URLs of our backend API and call the corresponding controller functions to handle requests.
+Within the router, you should define the URLs of our backend API and call the corresponding controller functions to handle requests.
 
 ```js
 class UserRouter {
@@ -183,7 +183,7 @@ class UserRouter {
 
 ### Controllers
 
-The controller which receives incoming requests from the router and prepares necessary parameters to call the appropriate service functions. Here, we define the logic for handling each API endpoint of our backend.
+The controller receives incoming requests from the router and prepares the necessary parameters to call the appropriate service functions. Here, we define the logic for handling each API endpoint of our backend.
 
 ```js
 class UserController {
@@ -247,7 +247,7 @@ MEN Boilerplate is licensed under the [MIT License](./LICENSE).
 
 ## Contributing to MEN Boilerplate
 
-I welcome contributions from anyone interested in improving MEN Boilerplate. Please keep in mind that this project follows a [Code of Conduct](./CODE_OF_CONDUCT.md) to ensure a welcoming community for all.
+I welcome contributions from anyone interested in improving MEN Boilerplate. Please remember that this project follows a [Code of Conduct](./CODE_OF_CONDUCT.md) to ensure a welcoming community for all.
 
 For more detailed information on how to contribute to this project, please refer to our [Contributing Guide](./CONTRIBUTING.md).
 

@@ -31,9 +31,11 @@ class UserService {
     }
 
     updateUser = async (id: string, toBeUpdated : Object) => {
-        const updated = await User.findByIdAndUpdate(id, {$set: toBeUpdated}, {new: true });
-        const updatedUser = new User(updated);
-        return await updatedUser.save();
+        const user = await User.findById(id);
+        if (!user) return null;
+        user.set(toBeUpdated);
+        const updatedUser = await user.save();
+        return updatedUser;
     }
 
     storeToken = async (id: string, token: string, expiresIn : number) => {

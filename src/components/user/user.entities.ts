@@ -51,8 +51,7 @@ const UserSchema :Schema = new Schema({
     qualified: {
         type: Boolean, default: false
     },
-    },
-    
+    },   
     {timestamps: true}
 );
 
@@ -61,7 +60,11 @@ const UserSchema :Schema = new Schema({
 UserSchema.pre<IUser>('save', async function (next) {
     const user = this;
     if (user.isModified('password')) {
-        user.password = await hashPassword(user.password);
+        try {
+            user.password = await hashPassword(user.password);
+        } catch (error) {
+            console.error('Error hashing password');
+        }
     }
     next();
 });

@@ -13,6 +13,7 @@ services:
       - /app/dist
     env_file:
       - .env
+    restart: on-failure
 
   mongodb:
     image: mongo
@@ -27,3 +28,17 @@ services:
     image: redis
     ports:
       - 6379:6379
+    restart: on-failure
+#   minio:
+#     image: minio/minio
+#     volumes:
+#       - minio_data:/data
+#     ports:
+#       - 9000:9000
+#     env_file:
+#       - .env
+#     command: server /data
+#     restart: on-failure
+
+# volumes:
+#   minio_data:

@@ -38,6 +38,21 @@ class UserService {
         return updatedUser;
     }
 
+       // admin methods
+       getAllUsers = async () => {
+        return await User.find().lean();
+    }
+
+    deleteUser = async (id: string) => {
+        return await User.findByIdAndDelete(id);
+    }
+
+    getAllAdmins = async () => {
+        return await User.find({isAdmin: true}).lean();
+    }
+
+
+    //token related methods
     storeToken = async (id: string, token: string, expiresIn : number) => {
         const tokensCacheClient = cache.tokenClientPool;
         const stored =  await cache.setToCache(tokensCacheClient, id, token, expiresIn);

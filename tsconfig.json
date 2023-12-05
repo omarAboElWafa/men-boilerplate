@@ -2,9 +2,9 @@
     "compilerOptions": {
         "target": "es2016",
         "module": "commonjs",
-        "rootDir": "src",
+        "rootDir": "./src",
         "resolveJsonModule": true, /* in case you are importing JSON files */
-        "outDir": "dist",
+        "outDir": "./dist",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,

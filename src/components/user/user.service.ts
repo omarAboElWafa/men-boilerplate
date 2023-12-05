@@ -31,11 +31,28 @@ class UserService {
     }
 
     updateUser = async (id: string, toBeUpdated : Object) => {
-        const updated = await User.findByIdAndUpdate(id, {$set: toBeUpdated}, {new: true });
-        const updatedUser = new User(updated);
-        return await updatedUser.save();
+        const user = await User.findById(id);
+        if (!user) return null;
+        user.set(toBeUpdated);
+        const updatedUser = await user.save();
+        return updatedUser;
     }
 
+       // admin methods
+       getAllUsers = async () => {
+        return await User.find().lean();
+    }
+
+    deleteUser = async (id: string) => {
+        return await User.findByIdAndDelete(id);
+    }
+
+    getAllAdmins = async () => {
+        return await User.find({isAdmin: true}).lean();
+    }
+
+
+    //token related methods
     storeToken = async (id: string, token: string, expiresIn : number) => {
         const tokensCacheClient = cache.tokenClientPool;
         const stored =  await cache.setToCache(tokensCacheClient, id, token, expiresIn);

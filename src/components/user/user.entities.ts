@@ -40,6 +40,19 @@ const UserSchema :Schema = new Schema({
         required: [true, 'Phone number is required'],
         unique: true,
     },
+    gender: {
+        type: String,
+        enum: ['male', 'female'],
+        default : 'male'
+    },
+    birthDate: {
+        type: Date,
+        default: null
+    },
+
+    isAdmin: {
+        type: Boolean, default: false
+    },
     loginCount :{
         type: Number,
         default: 0
@@ -51,8 +64,7 @@ const UserSchema :Schema = new Schema({
     qualified: {
         type: Boolean, default: false
     },
-    },
-    
+    },   
     {timestamps: true}
 );
 
@@ -61,7 +73,11 @@ const UserSchema :Schema = new Schema({
 UserSchema.pre<IUser>('save', async function (next) {
     const user = this;
     if (user.isModified('password')) {
-        user.password = await hashPassword(user.password);
+        try {
+            user.password = await hashPassword(user.password);
+        } catch (error) {
+            console.error('Error hashing password');
+        }
     }
     next();
 });
@@ -69,22 +85,6 @@ UserSchema.pre<IUser>('save', async function (next) {
 
 //compare password
 UserSchema.methods.comparePassword = comparePassword;
-
-// increment login count
-// TODO: check if this works
-UserSchema.methods.incrementLoginCount = async function()  {
-    // const user = this;
-    // user.loginCount = user.loginCount + 1;
-    // await user.save();
-    this.loginCount+=1;
-    return await this.save();
-}
-
-// TODO: revisit this, to make it work instead of helper function
-// UserSchema.methods.generateAuthToken = async function() {
-//     const user = this;
-//     return await generateAuthToken(user);
-// }
 
 
 export default mongoose.model<IUser>('User', UserSchema);
